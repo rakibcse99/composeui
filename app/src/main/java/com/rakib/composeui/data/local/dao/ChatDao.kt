@@ -3,9 +3,9 @@ package com.rakib.composeui.data.local.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.example.whatsappclone.data.local.entity.CallEntity
-import com.example.whatsappclone.data.local.entity.MessageEntity
-import com.example.whatsappclone.data.local.entity.UserEntity
+import com.rakib.composeui.data.local.entity.CallEntity
+import com.rakib.composeui.data.local.entity.MessageEntity
+import com.rakib.composeui.data.local.entity.UserEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
