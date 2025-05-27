@@ -1,12 +1,13 @@
 package com.rakib.composeui.data.repository
 
-import com.example.whatsappclone.data.local.dao.ChatDao
-import com.example.whatsappclone.data.mapper.toDomain
-import com.example.whatsappclone.data.mapper.toEntity
-import com.example.whatsappclone.domain.model.Call
-import com.example.whatsappclone.domain.model.Message
-import com.example.whatsappclone.domain.model.User
-import com.example.whatsappclone.domain.repository.ChatRepository
+
+import com.rakib.composeui.data.local.dao.ChatDao
+import com.rakib.composeui.data.mapper.toDomain
+import com.rakib.composeui.data.mapper.toEntity
+import com.rakib.composeui.domain.model.Call
+import com.rakib.composeui.domain.model.Message
+import com.rakib.composeui.domain.model.User
+import com.rakib.composeui.domain.repository.ChatRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
