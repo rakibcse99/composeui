@@ -24,32 +24,32 @@ fun ChatsScreen(onUserClick: (Int) -> Unit, viewModel: ChatViewModel = hiltViewM
     val uiState by viewModel.chatsUiState.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        OutlinedTextField(
-            value = "",
-            onValueChange = {},
-            label = { Text("Search Chats") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            shape = RoundedCornerShape(24.dp),
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search Icon",
-                    tint = Color.Gray
-                )
-            },
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White,
-                focusedIndicatorColor = Color(0xFF00A884),
-                unfocusedIndicatorColor = Color.Gray,
-                focusedLabelColor = Color(0xFF00A884),
-                unfocusedLabelColor = Color.Gray,
-                cursorColor = Color(0xFF00A884)
-            ),
-            enabled = false
-        )
+//        OutlinedTextField(
+//            value = "",
+//            onValueChange = {},
+//            label = { Text("Search Chats") },
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(horizontal = 16.dp, vertical = 8.dp),
+//            shape = RoundedCornerShape(24.dp),
+//            leadingIcon = {
+//                Icon(
+//                    imageVector = Icons.Default.Search,
+//                    contentDescription = "Search Icon",
+//                    tint = Color.Gray
+//                )
+//            },
+//            colors = TextFieldDefaults.colors(
+//                focusedContainerColor = Color.White,
+//                unfocusedContainerColor = Color.White,
+//                focusedIndicatorColor = Color(0xFF00A884),
+//                unfocusedIndicatorColor = Color.Gray,
+//                focusedLabelColor = Color(0xFF00A884),
+//                unfocusedLabelColor = Color.Gray,
+//                cursorColor = Color(0xFF00A884)
+//            ),
+//            enabled = false
+//        )
         when {
             uiState.isLoading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

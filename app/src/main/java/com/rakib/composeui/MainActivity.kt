@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.MoreVert
@@ -33,6 +34,7 @@ import com.rakib.composeui.presentation.screen.ChatScreen
 import com.rakib.composeui.presentation.screen.ChatsScreen
 import com.rakib.composeui.presentation.screen.StatusScreen
 import com.rakib.composeui.ui.theme.WhatsAppCloneTheme
+
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -117,50 +119,55 @@ fun AppNavigation() {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("WhatsApp", color = Color.White) },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF00A884)
-                ) , actions = {
-                    IconButton(onClick = { /* Camera */ }) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = "Camera", tint = Color.White)
+            AnimatedVisibility(visible = currentRoute != "calls" && currentRoute?.startsWith("chat/") != true) {
+                TopAppBar(
+                    title = { Text("WhatsApp", color = Color.White) },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = Color(0xFF00A884)
+                    ),
+                    actions = {
+                        IconButton(onClick = { /* Camera */ }) {
+                            Icon(imageVector = Icons.Default.Add, contentDescription = "Camera", tint = Color.White)
+                        }
+                        IconButton(onClick = { /* Search */ }) {
+                            Icon(imageVector = Icons.Default.Search, contentDescription = "Search", tint = Color.White)
+                        }
+                        IconButton(onClick = { /* Menu */ }) {
+                            Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu", tint = Color.White)
+                        }
                     }
-                    IconButton(onClick = { /* Search */ }) {
-                        Icon(imageVector = Icons.Default.Search, contentDescription = "Search", tint = Color.White)
-                    }
-                    IconButton(onClick = { /* Menu */ }) {
-                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu", tint = Color.White)
-                    }
-                }
-            )
+                )
+            }
         },
         bottomBar = {
-            NavigationBar {
-                navItems.forEach { screen ->
-                    NavigationBarItem(
-                        selected = currentRoute == screen.route,
-                        onClick = {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    saveState = true
+            AnimatedVisibility(visible = currentRoute?.startsWith("chat/") != true) {
+                NavigationBar {
+                    navItems.forEach { screen ->
+                        NavigationBarItem(
+                            selected = currentRoute == screen.route,
+                            onClick = {
+                                navController.navigate(screen.route) {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        icon = { Icon(imageVector = screen.icon, contentDescription = screen.label) },
-                        label = { Text(screen.label) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color(0xFF00A884),
-                            selectedTextColor = Color(0xFF00A884),
-                            indicatorColor = Color(0xFFE0F2F1)
+                            },
+                            icon = { Icon(imageVector = screen.icon, contentDescription = screen.label) },
+                            label = { Text(screen.label) },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = Color(0xFF00A884),
+                                selectedTextColor = Color(0xFF00A884),
+                                indicatorColor = Color(0xFFE0F2F1)
+                            )
                         )
-                    )
+                    }
                 }
             }
         },
         floatingActionButton = {
-            AnimatedVisibility(visible = currentRoute in listOf("chats", "calls")) {
+            AnimatedVisibility(visible = currentRoute in listOf("chats", "calls") && currentRoute?.startsWith("chat/") != true) {
                 FloatingActionButton(
                     onClick = { /* New chat or call */ },
                     containerColor = Color(0xFF00A884),

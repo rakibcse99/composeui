@@ -50,34 +50,27 @@ fun CallsScreen(viewModel: ChatViewModel = hiltViewModel()) {
     val uiState by viewModel.callsUiState.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize()) {
+        // Custom TopAppBar for CallsScreen
         TopAppBar(
-            title = { Text("Calls", color = Color.White) },
+            title = { Text("Calls", color = Color.Black) },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = Color(0xFF00A884)
-            ), actions = {
+                containerColor = Color(0xFFF8F7F7)
+            ),            actions = {
                 IconButton(onClick = { /* Search */ }) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        tint = Color.White
-                    )
+                    Icon(imageVector = Icons.Default.Search, contentDescription = "Search", tint = Color.Black)
                 }
                 IconButton(onClick = { /* Menu */ }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Menu",
-                        tint = Color.White
-                    )
+                    Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu", tint = Color.Black)
                 }
             }
         )
+
         when {
             uiState.isLoading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Color(0xFF00A884))
                 }
             }
-
             uiState.error != null -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
@@ -87,7 +80,6 @@ fun CallsScreen(viewModel: ChatViewModel = hiltViewModel()) {
                     )
                 }
             }
-
             uiState.calls.isEmpty() -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
@@ -97,7 +89,6 @@ fun CallsScreen(viewModel: ChatViewModel = hiltViewModel()) {
                     )
                 }
             }
-
             else -> {
                 LazyColumn {
                     item {
@@ -125,11 +116,7 @@ fun CallsScreen(viewModel: ChatViewModel = hiltViewModel()) {
                         )
                     }
                     items(uiState.calls) { call ->
-                        CallItem(
-                            call = call,
-                            userName = uiState.users.find { it.id == call.userId }?.name
-                                ?: "Unknown"
-                        )
+                        CallItem(call = call, userName = uiState.users.find { it.id == call.userId }?.name ?: "Unknown")
                     }
                 }
             }
@@ -139,8 +126,7 @@ fun CallsScreen(viewModel: ChatViewModel = hiltViewModel()) {
 
 @Composable
 fun CallItem(call: Call, userName: String) {
-    val timestamp =
-        SimpleDateFormat("dd MMM, HH:mm", Locale.getDefault()).format(Date(call.timestamp))
+    val timestamp = SimpleDateFormat("dd MMM, HH:mm", Locale.getDefault()).format(Date(call.timestamp))
     val callIcon = when {
         !call.isOutgoing -> Icons.Default.CallReceived
         call.isVideo -> Icons.Default.Call

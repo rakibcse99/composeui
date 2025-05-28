@@ -35,6 +35,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -92,50 +93,51 @@ fun ChatScreen(userId: Int, onBackClick: () -> Unit, viewModel: ChatViewModel = 
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        uiState.user?.let {
-            TopAppBar(
-                title = { Text(it.name, color = Color.White) },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF00A884)
-                ), navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* Video call */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Videocam,
-                            contentDescription = "Video Call",
-                            tint = Color.White
-                        )
-                    }
-                    IconButton(onClick = { /* Call */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Call,
-                            contentDescription = "Call",
-                            tint = Color.White
-                        )
-                    }
-                    IconButton(onClick = { /* Menu */ }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Menu",
-                            tint = Color.White
-                        )
-                    }
+        // Custom TopAppBar for ChatScreen
+        TopAppBar(
+            title = { uiState.user?.let { Text(it.name, color = Color.Black) } ?: Text("Chat") },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = Color(0xFFF3F6F6)
+            ),
+            navigationIcon = {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.Black
+                    )
                 }
-            )
-        }
+            },
+            actions = {
+                IconButton(onClick = { /* Video call */ }) {
+                    Icon(
+                        imageVector = Icons.Default.Videocam,
+                        contentDescription = "Video Call",
+                        tint = Color.Black
+                    )
+                }
+                IconButton(onClick = { /* Call */ }) {
+                    Icon(
+                        imageVector = Icons.Default.Call,
+                        contentDescription = "Call",
+                        tint = Color.Black
+                    )
+                }
+                IconButton(onClick = { /* Menu */ }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Menu",
+                        tint = Color.Black
+                    )
+                }
+            }
+        )
+
         Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-            // background missing
+              /// missing background
         ) {
             when {
                 uiState.isLoading -> {
@@ -143,7 +145,6 @@ fun ChatScreen(userId: Int, onBackClick: () -> Unit, viewModel: ChatViewModel = 
                         CircularProgressIndicator(color = Color(0xFF00A884))
                     }
                 }
-
                 uiState.error != null -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
@@ -153,7 +154,6 @@ fun ChatScreen(userId: Int, onBackClick: () -> Unit, viewModel: ChatViewModel = 
                         )
                     }
                 }
-
                 uiState.messages.isEmpty() -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
@@ -163,7 +163,6 @@ fun ChatScreen(userId: Int, onBackClick: () -> Unit, viewModel: ChatViewModel = 
                         )
                     }
                 }
-
                 else -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
@@ -195,12 +194,10 @@ fun ChatScreen(userId: Int, onBackClick: () -> Unit, viewModel: ChatViewModel = 
                     .background(Color.White, shape = MaterialTheme.shapes.medium),
                 label = { Text("Message") },
                 shape = MaterialTheme.shapes.medium,
-
-                //    change color
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = Color.Transparent
-                )
+//                colors = TextFieldDefaults.outlinedTextFieldColors(
+//                    focusedBorderColor = Color(0xFF00A884),
+//                    unfocusedBorderColor = Color.Gray
+//                )
             )
             IconButton(onClick = { filePicker.launch("*/*") }) {
                 Icon(imageVector = Icons.Default.AttachFile, contentDescription = "Attach")
@@ -268,10 +265,7 @@ fun MessageItem(message: Message) {
                     color = Color.Black
                 )
                 Text(
-                    text = SimpleDateFormat(
-                        "HH:mm",
-                        Locale.getDefault()
-                    ).format(Date(message.timestamp)),
+                    text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(message.timestamp)),
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.Gray,
                     textAlign = TextAlign.End
