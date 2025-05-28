@@ -5,7 +5,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "calls")
 data class CallEntity(
-    @PrimaryKey val id: Int,
+    @PrimaryKey
+    val id: Int,
     val userId: Int,
     val timestamp: Long,
     val isOutgoing: Boolean,

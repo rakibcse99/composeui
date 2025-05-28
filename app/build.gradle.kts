@@ -49,11 +49,13 @@ android {
         compose = true
     }
 
-//    composeOptions {
-//        kotlinCompilerExtensionVersion = "1.9.22"
-//    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.9.22"
+    }
 }
-
+hilt {
+    enableAggregatingTask = false
+}
 kapt {
     correctErrorTypes = true
 }
@@ -72,7 +74,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.navigation.compose)
     implementation(libs.material.icons.extended)
-
+    implementation (libs.kotlinx.coroutines.android)
     // Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)

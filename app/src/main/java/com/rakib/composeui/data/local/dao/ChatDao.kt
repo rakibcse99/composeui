@@ -1,7 +1,8 @@
-package com.rakib.composeui.data.local.dao
+package com.rakib.whatsappclone.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.rakib.composeui.data.local.entity.CallEntity
 import com.rakib.composeui.data.local.entity.MessageEntity
@@ -22,12 +23,12 @@ interface ChatDao {
     @Query("SELECT * FROM calls")
     fun getCalls(): Flow<List<CallEntity>>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertUser(user: UserEntity)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertMessage(message: MessageEntity)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertCall(call: CallEntity)
 }

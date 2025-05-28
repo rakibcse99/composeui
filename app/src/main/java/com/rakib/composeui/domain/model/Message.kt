@@ -1,9 +1,9 @@
 package com.rakib.composeui.domain.model
 
 data class Message(
-    val id: Int,
     val userId: Int,
-    val content: String,
+    val senderId: String,
+    val text: String,
     val timestamp: Long,
-    val isSent: Boolean
+    val isSent: Boolean = false
 )

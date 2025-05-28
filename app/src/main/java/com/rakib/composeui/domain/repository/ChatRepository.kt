@@ -7,11 +7,11 @@ import com.rakib.composeui.domain.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
-    fun getAllUsers(): Flow<List<User>>
+    fun getUsers(): Flow<List<User>>
     fun getUserById(userId: Int): Flow<User?>
     fun getMessagesForUser(userId: Int): Flow<List<Message>>
     fun getCalls(): Flow<List<Call>>
+    suspend fun sendMessage(message: Message)
     suspend fun insertUser(user: User)
-    suspend fun insertMessage(message: Message)
     suspend fun insertCall(call: Call)
 }

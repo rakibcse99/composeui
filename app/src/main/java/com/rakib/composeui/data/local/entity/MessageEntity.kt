@@ -5,9 +5,10 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "messages")
 data class MessageEntity(
-    @PrimaryKey val id: Int,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
     val userId: Int,
-    val content: String,
-    val timestamp: Long,
-    val isSent: Boolean
+    val senderId: String,
+    val text: String,
+    val timestamp: Long
 )

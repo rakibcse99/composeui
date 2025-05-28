@@ -4,9 +4,10 @@ import android.content.Context
 import androidx.room.Room
 
 import com.rakib.composeui.data.local.AppDatabase
-import com.rakib.composeui.data.local.dao.ChatDao
+
 import com.rakib.composeui.data.repository.ChatRepositoryImpl
 import com.rakib.composeui.domain.repository.ChatRepository
+import com.rakib.whatsappclone.data.local.dao.ChatDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,7 +24,7 @@ object AppModule {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            "whatsapp_clone_db"
+            "whatsapp_pro_db"
         ).build()
     }
 
