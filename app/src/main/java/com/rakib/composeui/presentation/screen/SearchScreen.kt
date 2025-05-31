@@ -8,23 +8,72 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.rakib.composeui.domain.model.User
 import com.rakib.composeui.presentation.viewmodel.ChatViewModel
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatsScreen(onUserClick: (Int) -> Unit, viewModel: ChatViewModel = hiltViewModel()) {
+fun SearchScreen(onUserClick: (Int) -> Unit, onBackClick: () -> Unit, viewModel: ChatViewModel = hiltViewModel()) {
     val uiState by viewModel.chatsUiState.collectAsState()
+    var searchText by remember { mutableStateOf(TextFieldValue("")) }
 
     Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
+        OutlinedTextField(
+            value = searchText,
+            onValueChange = { searchText = it },
+            placeholder = {
+                Text("Search Users", color = Color.Black)
+            },
+            modifier = Modifier
+                .fillMaxWidth().background(Color.Gray)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            shape = RoundedCornerShape(24.dp),
+            leadingIcon = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { onBackClick() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.Black
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        tint = Color.Black
+                    )
+                }
+            },
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                disabledContainerColor = MaterialTheme.colorScheme.surface,
+
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+
+                cursorColor = Color(0xFF00A884),
+                focusedPlaceholderColor = Color(0xFF8696A0),
+                unfocusedPlaceholderColor = Color(0xFF8696A0),
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black
+            ),
+        )
+
 
         when {
             uiState.isLoading -> {
@@ -44,16 +93,19 @@ fun ChatsScreen(onUserClick: (Int) -> Unit, viewModel: ChatViewModel = hiltViewM
             uiState.users.isEmpty() -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        text = "No chats available",
+                        text = "No users available",
                         color = Color.Gray,
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }
             else -> {
+                val filteredUsers = uiState.users.filter {
+                    it.name.contains(searchText.text, ignoreCase = true)
+                }
                 LazyColumn {
-                    items(uiState.users) { user ->
-                        ChatItem(user = user, onClick = { onUserClick(user.id) })
+                    items(filteredUsers) { user ->
+                        UserItem(user = user, onClick = { onUserClick(user.id) })
                     }
                 }
             }
@@ -62,7 +114,7 @@ fun ChatsScreen(onUserClick: (Int) -> Unit, viewModel: ChatViewModel = hiltViewM
 }
 
 @Composable
-fun ChatItem(user: User, onClick: () -> Unit) {
+fun UserItem(user: User, onClick: () -> Unit) {
     val lastMessage = "Last message..."
     val timestamp = "Today"
     Card(

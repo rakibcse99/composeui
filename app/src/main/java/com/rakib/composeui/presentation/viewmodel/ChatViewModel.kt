@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ChatViewModel @Inject constructor(
+open class ChatViewModel @Inject constructor(
     private val getUsersUseCase: GetUsersUseCase,
     private val getUserByIdUseCase: GetUserByIdUseCase,
     private val getMessagesForUserUseCase: GetMessagesForUserUseCase,
@@ -98,7 +98,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun loadMessagesForUser(userId: Int) {
+    open fun loadMessagesForUser(userId: Int) {
         viewModelScope.launch {
             _chatUiState.value = ChatUiState(isLoading = true)
             try {
@@ -126,7 +126,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun sendMessage(message: Message) {
+    open fun sendMessage(message: Message) {
         viewModelScope.launch {
             try {
                 sendMessageUseCase(message)

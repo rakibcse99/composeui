@@ -32,10 +32,11 @@ import androidx.navigation.compose.rememberNavController
 import com.rakib.composeui.presentation.screen.CallsScreen
 import com.rakib.composeui.presentation.screen.ChatScreen
 import com.rakib.composeui.presentation.screen.ChatsScreen
+import com.rakib.composeui.presentation.screen.SearchScreen
 import com.rakib.composeui.presentation.screen.StatusScreen
 import com.rakib.composeui.ui.theme.WhatsAppCloneTheme
-
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -119,7 +120,9 @@ fun AppNavigation() {
 
     Scaffold(
         topBar = {
-            AnimatedVisibility(visible = currentRoute != "calls" && currentRoute?.startsWith("chat/") != true) {
+            AnimatedVisibility(
+                visible = currentRoute != "calls" && currentRoute != "search" && currentRoute?.startsWith("chat/") != true
+            ) {
                 TopAppBar(
                     title = { Text("WhatsApp", color = Color.White) },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -129,7 +132,7 @@ fun AppNavigation() {
                         IconButton(onClick = { /* Camera */ }) {
                             Icon(imageVector = Icons.Default.Add, contentDescription = "Camera", tint = Color.White)
                         }
-                        IconButton(onClick = { /* Search */ }) {
+                        IconButton(onClick = { navController.navigate("search") }) {
                             Icon(imageVector = Icons.Default.Search, contentDescription = "Search", tint = Color.White)
                         }
                         IconButton(onClick = { /* Menu */ }) {
@@ -140,7 +143,9 @@ fun AppNavigation() {
             }
         },
         bottomBar = {
-            AnimatedVisibility(visible = currentRoute?.startsWith("chat/") != true) {
+            AnimatedVisibility(
+                visible = currentRoute != "search" && currentRoute?.startsWith("chat/") != true
+            ) {
                 NavigationBar {
                     navItems.forEach { screen ->
                         NavigationBarItem(
@@ -156,6 +161,7 @@ fun AppNavigation() {
                             },
                             icon = { Icon(imageVector = screen.icon, contentDescription = screen.label) },
                             label = { Text(screen.label) },
+
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = Color(0xFF00A884),
                                 selectedTextColor = Color(0xFF00A884),
@@ -167,9 +173,11 @@ fun AppNavigation() {
             }
         },
         floatingActionButton = {
-            AnimatedVisibility(visible = currentRoute in listOf("chats", "calls") && currentRoute?.startsWith("chat/") != true) {
+            AnimatedVisibility(
+                visible = currentRoute in listOf("chats", "calls") && currentRoute != "search" && currentRoute?.startsWith("chat/") != false
+            ) {
                 FloatingActionButton(
-                    onClick = { /* New chat or call */ },
+                    onClick = {  },
                     containerColor = Color(0xFF00A884),
                     contentColor = Color.White
                 ) {
@@ -202,6 +210,16 @@ fun AppNavigation() {
             composable("chat/{userId}") { backStackEntry ->
                 val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull() ?: 0
                 ChatScreen(userId = userId, onBackClick = { navController.popBackStack() })
+            }
+            composable("search") {
+                SearchScreen(
+                    onUserClick = { userId ->
+                        navController.navigate("chat/$userId") {
+                            popUpTo("search") { inclusive = true }
+                        }
+                    },
+                    onBackClick = { navController.popBackStack() }
+                )
             }
         }
     }
