@@ -112,10 +112,8 @@ Below are some screenshots of the app in action:
   ![Chat Screen](https://raw.githubusercontent.com/rakibcse99/composeui/refs/heads/master/app/src/main/res/drawable/image2.jpeg)
 
 - **Search Screen**  
-  ![Search Screen](https://raw.githubusercontent.com/rakibcse99/composeui/refs/heads/master/app/src/main/res/drawable/image1.jpeg)
+  ![Search Screen](https://raw.githubusercontent.com/rakibcse99/composeui/refs/heads/master/app/src/main/res/drawable/image3.jpeg)
 
-- **Calls Screen**  
-  ![Calls Screen](https://raw.githubusercontent.com/rakibcse99/composeui/refs/heads/master/app/src/main/res/drawable/image1.jpeg)
 
 
 ## License
