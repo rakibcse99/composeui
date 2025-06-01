@@ -1,6 +1,8 @@
 package com.rakib.composeui.presentation.screen
 
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -9,6 +11,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +40,7 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.EmojiEmotions
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.Card
@@ -64,6 +68,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
@@ -73,7 +78,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
 import com.rakib.composeui.R
 import com.rakib.composeui.domain.model.Message
 import com.rakib.composeui.domain.model.User
@@ -82,6 +89,7 @@ import com.rakib.composeui.presentation.viewmodel.ChatViewModel.ChatUiState
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -103,15 +111,18 @@ fun ChatScreen(
         ActivityResultContracts.GetContent()
     ) { uri ->
         uri?.let {
+            val fileName = getFileNameFromUri(context, uri) ?: "Document"
+            val mimeType = context.contentResolver.getType(uri) ?: "application/octet-stream"
             val message = Message(
                 userId = userId,
                 senderId = userId.toString(),
-                text = "File: $it",
+                text = fileName,
+                fileUri = uri.toString(),
                 timestamp = System.currentTimeMillis(),
                 isSent = true
             )
             viewModel.sendMessage(message)
-            Toast.makeText(context, "File attached", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "File attached: $fileName", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -125,7 +136,7 @@ fun ChatScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(72.dp) // Custom height
+                .height(72.dp)
                 .background(Color(0xFFF3F6F6))
                 .padding(horizontal = 16.dp),
         ) {
@@ -178,7 +189,7 @@ fun ChatScreen(
         }
 
         // Chat Content
-                Box(
+        Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
@@ -208,7 +219,7 @@ fun ChatScreen(
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
                             text = "No messages yet",
-                            color = Color(0xFF8696A0), // WhatsApp gray
+                            color = Color(0xFF8696A0),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
@@ -241,7 +252,7 @@ fun ChatScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
-                onClick = {  },
+                onClick = { /* Emoji */ },
                 modifier = Modifier.size(48.dp)
             ) {
                 Icon(
@@ -268,11 +279,9 @@ fun ChatScreen(
                     focusedContainerColor = MaterialTheme.colorScheme.surface,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                     disabledContainerColor = MaterialTheme.colorScheme.surface,
-
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,
-
                     cursorColor = Color(0xFF00A884),
                     focusedPlaceholderColor = Color(0xFF8696A0),
                     unfocusedPlaceholderColor = Color(0xFF8696A0),
@@ -283,34 +292,8 @@ fun ChatScreen(
                 singleLine = true
             )
 
-
-//                       OutlinedTextField(
-//                            value = messageText,
-//                            onValueChange = { messageText = it },
-//                            modifier = Modifier
-//                                .weight(1f)
-//                                .background(
-//                                    color = MaterialTheme.colorScheme.surface,
-//                                    shape = RoundedCornerShape(24.dp)
-//                                ),
-//                            placeholder = { Text("Message", color = Color(0xFF8696A0)) },
-//                            shape = RoundedCornerShape(24.dp),
-//                            colors = TextFieldDefaults.colors(
-//                                focusedContainerColor = MaterialTheme.colorScheme.surface,
-//                                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-//                                focusedIndicatorColor = Color(0xFF00A884),
-//                                unfocusedIndicatorColor = Color(0xFF8696A0),
-//                                cursorColor = Color(0xFF00A884),
-//
-//                                focusedPlaceholderColor = Color(0xFF8696A0),
-//                                unfocusedPlaceholderColor = Color(0xFF8696A0)
-//                            ),
-//                            textStyle = MaterialTheme.typography.bodyMedium,
-//                            singleLine = true
-//                        )
-
             IconButton(
-                onClick = { filePicker.launch("*/*") },
+                onClick = { filePicker.launch("application/pdf,image/*") }, // Restrict to PDFs and images
                 modifier = Modifier.size(48.dp)
             ) {
                 Icon(
@@ -328,6 +311,7 @@ fun ChatScreen(
                             userId = userId,
                             senderId = userId.toString(),
                             text = messageText,
+                            fileUri = null,
                             timestamp = System.currentTimeMillis(),
                             isSent = true
                         )
@@ -337,7 +321,8 @@ fun ChatScreen(
                             Message(
                                 userId = userId,
                                 senderId = (userId + 1).toString(),
-                                text = "Reply: ${messageText.take(10)}...",
+                                text = "Reply: ${message.text.take(10)}...",
+                                fileUri = null,
                                 timestamp = System.currentTimeMillis() + 1000,
                                 isSent = false
                             )
@@ -362,12 +347,26 @@ fun ChatScreen(
 fun MessageItem(message: Message) {
     val alpha by animateFloatAsState(
         targetValue = 1f,
-        animationSpec = tween(durationMillis = 300), // Faster animation for WhatsApp's snappy feel
+        animationSpec = tween(durationMillis = 300),
         label = "MessageFade"
     )
     val bubbleColor = if (message.isSent) Color(0xFFDCF8C6) else Color.White
     val alignment = if (message.isSent) Arrangement.End else Arrangement.Start
-    val cornerRadius = 16.dp // WhatsApp's squircle bubble style
+    val cornerRadius = 16.dp
+    val context = LocalContext.current
+
+    // Determine file type based on MIME type or URI
+    val isImage = message.fileUri?.let { uriString ->
+        val uri = Uri.parse(uriString)
+        val mimeType = context.contentResolver.getType(uri) ?: ""
+        mimeType.startsWith("image/")
+    } ?: false
+
+    val isPdf = message.fileUri?.let { uriString ->
+        val uri = Uri.parse(uriString)
+        val mimeType = context.contentResolver.getType(uri) ?: ""
+        mimeType == "application/pdf"
+    } ?: false
 
     Row(
         modifier = Modifier
@@ -384,18 +383,68 @@ fun MessageItem(message: Message) {
                 bottomStart = cornerRadius,
                 bottomEnd = cornerRadius
             ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+            modifier = Modifier.clickable {
+                message.fileUri?.let { uriString ->
+                    try {
+                        val uri = Uri.parse(uriString)
+                        val mimeType = context.contentResolver.getType(uri) ?: "application/octet-stream"
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            setDataAndType(uri, mimeType)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        startActivity(context, Intent.createChooser(intent, "Open with"), null)
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Unable to open file: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         ) {
             Column(
                 modifier = Modifier
                     .padding(horizontal = 12.dp, vertical = 8.dp)
-                    .widthIn(max = 300.dp) // Max width for bubbles
+                    .widthIn(max = 300.dp)
             ) {
-                Text(
-                    text = message.text,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                when {
+                    isImage -> {
+                        // Display image preview
+                        Image(
+                            painter = rememberAsyncImagePainter(model = message.fileUri),
+                            contentDescription = "Image Preview",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(200.dp) // WhatsApp-style image size
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+                    }
+                    isPdf -> {
+                        // Display PDF
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.PictureAsPdf,
+                                contentDescription = "PDF Icon",
+                                tint = Color(0xFFD32F2F),
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = message.text,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                    else -> {
+                        // Display text message
+                        Text(
+                            text = message.text,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
@@ -411,7 +460,7 @@ fun MessageItem(message: Message) {
                         Icon(
                             imageVector = Icons.Default.DoneAll,
                             contentDescription = "Read Status",
-                            tint = Color(0xFF53BDEB), // WhatsApp blue for read ticks
+                            tint = Color(0xFF53BDEB),
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -421,18 +470,15 @@ fun MessageItem(message: Message) {
     }
 }
 
-//@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
-//@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-//@Composable
-//fun ChatScreenPreview() {
-//    MaterialTheme {
-//        ChatScreen(
-//            userId = 1,
-//            onBackClick = {},
-//            viewModel = object : ChatViewModel() {
-//                override fun loadMessagesForUser(userId: Int) {}
-//                override fun sendMessage(message: Message) {}
-//            }
-//        )
-//    }
-//}
+// Helper function to get file name from URI
+fun getFileNameFromUri(context: android.content.Context, uri: Uri): String? {
+    val cursor = context.contentResolver.query(uri, null, null, null, null)
+    return cursor?.use {
+        if (it.moveToFirst()) {
+            val displayNameIndex = it.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+            if (displayNameIndex != -1) it.getString(displayNameIndex) else null
+        } else {
+            null
+        }
+    }
+}
