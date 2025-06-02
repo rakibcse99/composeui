@@ -40,8 +40,8 @@ Follow these steps to get the project running:
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-username/WhatsAppClone.git
-   cd WhatsAppClone
+   git clone https://github.com/rakibcse99/composeui.git
+   cd composeui
    ```
 
 2. **Set Up Hilt**:
